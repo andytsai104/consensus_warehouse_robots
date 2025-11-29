@@ -81,5 +81,32 @@ source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
+---
+## Key Features
 
+* **Advanced Physics:** Custom inertia tensors and friction coefficients (`mu1`/`mu2`) tuned for realistic skid-steering/differential drive in Gazebo Fortress.
+* **Sensor Fusion:**
+    * **Lidar:** GPU-accelerated Ray Sensor mounted on `lidar_link`.
+    * **Odometry:** DiffDrive plugin publishing to `/odom` and `/tf`.
+* **ROS-GZ Bridge:** YAML-configured bridge for scalable topic communication (`/cmd_vel`, `/scan`, `/tf`).
+* **Mapping:** Integrated `slam_toolbox` for generating 2D occupancy grids of the warehouse.
 
+---
+
+## Roadmap & TODO
+
+- [x] **Robot Design:** 2-Wheel Differential Drive with Caster (Low friction turning).
+- [x] **Simulation:** Migration from Gazebo Classic to Fortress.
+- [x] **Sensors:** Lidar implementation and TF tree alignment.
+- [x] **Mapping:** SLAM Toolbox integration.
+- [ ] **Navigation:** Configure Nav2 stack (Costmaps, Planners).
+- [ ] **Multi-Robot:** Spawn multiple agents with namespaces (`/robot1`, `/robot2`).
+- [ ] **Consensus:** Implement `fleet_manager` logic for decentralized task bidding.
+
+---
+## Maintainer
+**Andy Tsai**  
+M.S. Robotics & Autonomous Systems @ ASU  
+📧 andystsai1040@gmail.com  
+🌐 [LinkedIn link](https://www.linkedin.com/in/chih-hao-tsai/)
+🌐 [Github Profile](https://github.com/andytsai104)
