@@ -94,36 +94,23 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ---
 
 ## Roadmap & TODO
-
-- [x] **Robot Design:** 2-Wheel Differential Drive with Caster (Low friction turning).
-- [x] **Simulation:** Migration from Gazebo Classic to Fortress.
-- [x] **Sensors:** Lidar implementation and TF tree alignment.
-- [x] **Mapping:** SLAM Toolbox integration.
-- [ ] **Navigation:** Configure Nav2 stack (Costmaps, Planners).
-- [ ] **Multi-Robot:** Spawn multiple agents with namespaces (`/robot1`, `/robot2`).
-- [ ] **Consensus:** Implement `fleet_manager` logic for decentralized task bidding.
-
----
-
-## Roadmap & TODO
-
-- Phase 1: Simulation Basics (Completed)
+### Phase 1: Simulation Basics (Completed)
 - [x] Robot Design: 2-Wheel Differential Drive with Caster (Low friction turning).
 - [x] Simulation: Migration from Gazebo Classic to Fortress.
 - [x] Sensors: Lidar implementation and TF tree alignment.
 - [x] Mapping: SLAM Toolbox integration.
 
-- Phase 2: Navigation & Control (Current)
+### Phase 2: Navigation & Control (Current)
 - [ ] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
 - [ ] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
 - [ ] Multi-Robot Spawning: Create launch files to spawn /robot1 and /robot2 with separate namespaces.
 
-- Phase 3: Fleet Management (The Core Logic)
+### Phase 3: Fleet Management (The Core Logic)
 - [ ] Task Manager Node: Create the "Auctioneer" that broadcasts tasks.
 - [ ] Bidder Nodes: Create the logic where robots calculate path costs using Nav2's ComputePathToPose.
 - [ ] Consensus Algorithm: Implement the decision logic (e.g., lowest bid wins).
 
-- Phase 4: Analysis & Metrics
+### Phase 4: Analysis & Metrics
 - [ ] Data Logger: Record metrics (Total distance traveled, Task completion time, Idle time).
 - [ ] Comparison: Compare "Consensus" performance vs. "Random Assignment" or "Nearest Neighbor".
 
