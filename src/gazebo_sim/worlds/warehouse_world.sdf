@@ -1,0 +1,170 @@
+<?xml version="1.0" ?>
+<!-- <sdf version="1.9"> for gazebo gz/ign version-->
+<sdf version="1.9">
+  <world name="warehouse_world">
+    <gravity>0 0 -9.8</gravity>
+    <!-- <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include> -->
+    
+    <!-- sun -->
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>-0.5 0.5 -1</direction>
+    </light>
+
+    <!-- ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="ground_link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- robot spawn point -->
+    <model name="spawn_point">
+      <static>true</static>
+      <pose>2  -3  0  0 0 0</pose> 
+      <link name="marker">
+        <visual name="v"><geometry><cylinder><radius>0.05</radius><length>0.01</length></cylinder></geometry></visual>
+      </link>
+    </model>
+
+    <!-- ==== 參數（已代入數值）====
+         貨架平面尺寸 S (長=寬) = 2.0 m
+         通道寬 W = 3.0 m
+         置中 3×3 貨架 → 中心間距 = S + W = 5.0 m
+         牆位置半徑 R = 0.5 * (3*S + 4*W) = 0.5 * (6 + 12) = 9.0 m
+         牆長 = 2R = 18.0 m，高 3.0 m，厚 0.2 m
+    ================================= -->
+
+    <!-- 四面牆：確保邊界通道也等寬 (= W) -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>0 9.0 1.5 0 0 0</pose>
+      <link name="l">
+        <collision name="c"><geometry><box><size>18.0 0.2 3.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>18.0 0.2 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_south">
+      <static>true</static>
+      <pose>0 -9.0 1.5 0 0 0</pose>
+      <link name="l">
+        <collision name="c"><geometry><box><size>18.0 0.2 3.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>18.0 0.2 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_east">
+      <static>true</static>
+      <pose>9.0 0 1.5 0 0 0</pose>
+      <link name="l">
+        <collision name="c"><geometry><box><size>0.2 18.0 3.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 18.0 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_west">
+      <static>true</static>
+      <pose>-9.0 0 1.5 0 0 0</pose>
+      <link name="l">
+        <collision name="c"><geometry><box><size>0.2 18.0 3.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 18.0 3.0</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- 室內點光，避免室內太暗 -->
+    <light name="ceiling" type="point">
+      <pose>0 0 6 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation><range>50</range><constant>0.2</constant><linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+      <cast_shadows>1</cast_shadows>
+    </light>
+
+    <!-- 9 個貨架（用正方形 Box 代表），中心在 {-5,0,5} × {-5,0,5}，高 2.2 m -->
+    <!-- Box 尺寸：2.0 × 2.0 × 2.2；中心 z=1.1 -->
+    <!-- y = +5 -->
+    <model name="shelf_1_1"><static>true</static><pose>-5 5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_1_2"><static>true</static><pose>0 5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_1_3"><static>true</static><pose>5 5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+
+    <!-- y = 0 -->
+    <model name="shelf_2_1"><static>true</static><pose>-5 0 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_2_2"><static>true</static><pose>0 0 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_2_3"><static>true</static><pose>5 0 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+
+    <!-- y = -5 -->
+    <model name="shelf_3_1"><static>true</static><pose>-5 -5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_3_2"><static>true</static><pose>0 -5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+    <model name="shelf_3_3"><static>true</static><pose>5 -5 1.1 0 0 0</pose>
+      <link name="b"><collision name="c"><geometry><box><size>2.0 2.0 2.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 2.0 2.2</size></box></geometry>
+          <material><ambient>0.3 0.3 0.35 1</ambient></material></visual></link>
+    </model>
+  </world>
+</sdf>

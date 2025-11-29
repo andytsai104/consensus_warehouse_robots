@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="warehouse_robots">
+
+  <!-- Global scale factor -->
+  <xacro:property name="S" value="4.0"/>
+
+  <!-- Default material -->
+  <material name="default_color">
+    <color rgba="0.62745 0.62745 0.62745 1"/>
+  </material>
+  
+  <!-- ===========================
+       base_footprint
+  ============================ -->
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <!-- ===========================
+       Base link
+  ============================ -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- <origin xyz="${-0.027013*S} ${-3.2999E-08*S} ${0.01722*S}" rpy="0 0 0"/> -->
+      <!-- origin mass and inertia -->
+      <!-- <mass value="3.777"/> -->
+      <!-- <inertia ixx="0.011028" ixy="1.8783E-09" ixz="0.0017425"
+               iyy="0.024419" iyz="-1.4644E-08" izz="0.03312"/> -->
+
+      <!-- mass and inertia after scaling up -->
+      <mass value="24.1728"/>
+      <inertia ixx="1.1292672" ixy="1.923E-07" ixz="0.17664"
+               iyy="2.5005056" iyz="-1.500E-06" izz="3.391488"/>
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://warehouse_robot_description/meshes/base_link.STL"
+              scale="${S} ${S} ${S}"/>
+      </geometry>
+      <material name="default_color"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://warehouse_robot_description/meshes/base_link.STL"
+              scale="${S} ${S} ${S}"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+
+  <!-- ===========================
+       Wheels Macro
+  ============================ -->
+  <xacro:macro name="wheel_link" params="wheel_name mesh x y z axis">
+    <link name="${wheel_name}">
+      
+      <inertial>
+        <origin xyz="${0*S} ${0*S} ${z*S}" rpy="0 0 0"/>
+        <!-- origin mass and inertia -->
+        <!-- <mass value="0.082383"/> -->
+        <!-- <inertia ixx="5.899E-05" ixy="0" ixz="0"
+                 iyy="5.899E-05" iyz="0" izz="0.0001153"/> -->
+        <mass value="0.5272512"/>
+        <inertia ixx="6.040576E-03" ixy="0" ixz="0"
+                 iyy="6.040576E-03" iyz="0" izz="0.01180672"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://warehouse_robot_description/meshes/${mesh}"
+                scale="${S} ${S} ${S}"/>
+        </geometry>
+        <material name="default_color"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://warehouse_robot_description/meshes/${mesh}"
+                scale="${S} ${S} ${S}"/>
+        </geometry>
+      </collision>
+
+    </link>
+
+    <joint name="${wheel_name}_joint" type="continuous">
+      <origin xyz="${x*S} ${y*S} ${-0.039*S}" rpy="1.5708 0 0"/>
+      <parent link="base_link"/>
+      <child link="${wheel_name}"/>
+      <axis xyz="${axis}"/>
+      <limit effort="10" velocity="10"/>
+      <dynamics damping="0.1" friction="0.1"/>
+    </joint>
+    
+    <!--friction to the wheels-->
+    <gazebo reference="${wheel_name}">
+      <mu1>2.0</mu1>
+      <mu2>0.8</mu2>
+      <kp>10000000.0</kp> 
+      <kd>1.0</kd>        
+      <material>Gazebo/DarkGrey</material> 
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Instantiate wheels -->
+  <xacro:wheel_link wheel_name="RB_wheel" mesh="RB_wheel.STL" x="-0.10793" y="-0.1235" z="-0.0075004" axis="0 0 -1"/>
+  <xacro:wheel_link wheel_name="RF_wheel" mesh="RF_wheel.STL" x="0.12207"  y="-0.1235" z="-0.0075004" axis="0 0 -1"/>
+  <xacro:wheel_link wheel_name="LB_wheel" mesh="LB_wheel.STL" x="-0.10793" y="0.1235"  z="0.0074996"  axis="0 0 1"/>
+  <xacro:wheel_link wheel_name="LF_wheel" mesh="LF_wheel.STL" x="0.12207"  y="0.1235"  z="0.0074996"  axis="0 0 1"/>
+  
+  <!-- ===========================
+       Sensor (LiDAR)
+  ============================ -->
+  <link name="lidar_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.01"/> <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+
+    </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    
+    <origin xyz="${0.12207*S} ${0*S} ${0.05*S}" rpy="0 0 0"/> 
+  </joint>
+
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <topic>scan</topic>
+      <update_rate>10</update_rate>
+      	
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <frame_id>lidar_link</frame_id>
+      
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14</min_angle>
+            <max_angle>3.14</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.3</min>
+          <max>12.0</max>
+        </range>
+      </ray>
+      <plugin filename="libignition-gazebo-sensors-system.so"
+              name="ignition::gazebo::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+      </plugin>
+    </sensor>
+  </gazebo>
+  
+  
+  <!-- ===========================
+       Diff Drive
+  ============================ -->
+  <gazebo>
+    <plugin
+      filename="libignition-gazebo-diff-drive-system.so"
+      name="ignition::gazebo::systems::DiffDrive">
+
+      <left_joint>LF_wheel_joint</left_joint>
+      <left_joint>LB_wheel_joint</left_joint>
+      <right_joint>RF_wheel_joint</right_joint>
+      <right_joint>RB_wheel_joint</right_joint>
+
+      <wheel_separation>0.988</wheel_separation>
+      <wheel_radius>0.2</wheel_radius>
+      
+      <max_linear_acceleration>20.0</max_linear_acceleration>
+      <min_linear_acceleration>-20.0</min_linear_acceleration>
+      <max_angular_acceleration>20.0</max_angular_acceleration>
+      <min_angular_acceleration>-20.0</min_angular_acceleration>
+
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <odom_publish_frequency>30</odom_publish_frequency>
+
+    </plugin>
+  </gazebo>
+
+</robot>
