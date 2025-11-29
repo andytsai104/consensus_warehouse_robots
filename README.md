@@ -50,14 +50,13 @@ sudo apt-get install ros-humble-ros-gz \
 2. Build the Workspace
 ```text
 # Create a workspace directory (if you haven't already)
-mkdir -p ~/warehouse_ws/src
-cd ~/warehouse_ws/src
+mkdir -p ~/warehouse_ws
+cd ~/warehouse_ws
 
 # Clone this repository
 git clone https://github.com/andytsai104/ros2_warehouse_simulation.git
 
 # Build packages
-cd ~/warehouse_ws
 colcon build --symlink-install
 source install/setup.bash
 ```
