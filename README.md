@@ -104,9 +104,21 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 - [ ] **Consensus:** Implement `fleet_manager` logic for decentralized task bidding.
 
 ---
+
 ## Maintainer
 **Andy Tsai**  
 M.S. Robotics & Autonomous Systems @ ASU  
 📧 andystsai1040@gmail.com  
 🌐 [LinkedIn link](https://www.linkedin.com/in/chih-hao-tsai/)
 🌐 [Github Profile](https://github.com/andytsai104)
+
+---
+
+## TODO:
+1. 設計機器人基本功能（PID controller: 直走，轉彎，停止...）
+2. SLAM建立倉庫地圖
+3. 用Nav2 做出coastmap, planners
+4. Consensus decision maker
+5. 數據記錄器 (Metric logger for consensus and RL)
+
+---
