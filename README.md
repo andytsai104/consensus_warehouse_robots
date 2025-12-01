@@ -70,12 +70,12 @@ source install/setup.bash
 We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-GZ Bridge automatically.
 Basic Simulation (Drive Around):
 ```text
-ros2 launch bringup_sim gazebo.launch.py
+ros2 launch bringup_sim gazebo_sim.launch.py
 ```
 
 Simulation with Mapping (SLAM):
 ```text
-ros2 launch bringup_sim gazebo_control.launch.py
+ros2 launch bringup_sim gazebo_slam.launch.py
 ```
 
 4. Control the Robot
