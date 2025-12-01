@@ -6,6 +6,11 @@ A robust **ROS 2 Humble** and **Gazebo Fortress** simulation for multi-robot war
 ![Gazebo](https://img.shields.io/badge/Gazebo-Fortress-orange)
 ![License](https://img.shields.io/badge/License-Apache_2.0-green)
 
+- robot's model:
+<p align="center">
+  <img src="./media/warehouse_robot_model.png" width="500" />
+</p>
+
 ---
 
 ## Workspace Architecture
@@ -65,20 +70,16 @@ source install/setup.bash
 We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-GZ Bridge automatically.
 Basic Simulation (Drive Around):
 ```text
-ros2 launch bringup_sim gazebo_control.launch.py
+ros2 launch bringup_sim gazebo.launch.py
 ```
 
 Simulation with Mapping (SLAM):
 ```text
-ros2 launch bringup_sim gazebo_control.launch.py slam:=True
+ros2 launch bringup_sim gazebo_control.launch.py
 ```
 
 4. Control the Robot
-The robot uses a differential drive controller. Open a new terminal to drive it manually:
-```text
-source install/setup.bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
-```
+The robot uses a differential drive controller in another pop-up terminal.
 
 ---
 ## Key Features
@@ -93,13 +94,13 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ---
 
 ## Roadmap & TODO
-### Phase 1: Simulation Basics (Completed)
+### Phase 1: Simulation Basics
 - [x] Robot Design: 2-Wheel Differential Drive with Caster (Low friction turning).
 - [x] Simulation: Migration from Gazebo Classic to Fortress.
 - [x] Sensors: Lidar implementation and TF tree alignment.
-- [x] Mapping: SLAM Toolbox integration.
+- [ ] Mapping: SLAM Toolbox integration.
 
-### Phase 2: Navigation & Control (Current)
+### Phase 2: Navigation & Control
 - [ ] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
 - [ ] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
 - [ ] Multi-Robot Spawning: Create launch files to spawn /robot1 and /robot2 with separate namespaces.
