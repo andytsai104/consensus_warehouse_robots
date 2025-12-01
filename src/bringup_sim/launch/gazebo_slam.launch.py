@@ -5,7 +5,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.actions import IncludeLaunchDescription, AppendEnvironmentVariable, SetEnvironmentVariable, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, AppendEnvironmentVariable, SetEnvironmentVariable, DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
@@ -17,8 +17,9 @@ def generate_launch_description():
     install_dir = os.path.dirname(pkg_description)                                          # Gets 'install/share' parent
     rviz_config_file = os.path.join(pkg_bringup_sim, 'config', 'rviz_scan_map.rviz')        # RViz config
     world_file = os.path.join(pkg_gazebo_sim, 'worlds', 'warehouse_world.sdf')              # World files
-    xacro_file = os.path.join(pkg_description, 'urdf', 'warehouse_robots.urdf.xacro')       # Robot description
+    xacro_file = os.path.join(pkg_description, 'urdf', '2wd_warehouse_robots.urdf.xacro')   # Robot description
     bridge_config_file = os.path.join(pkg_bringup_sim, 'config', 'ros_gz_bridges.yaml')     # Bridge config
+    slam_config_file = os.path.join(pkg_bringup_sim, 'config', 'slam_nav2_params.yaml')     # SLAM config
     pkg_slam_toolbox = get_package_share_directory('slam_toolbox')                          # SLAM Toolbox package 
     
 
@@ -40,38 +41,24 @@ def generate_launch_description():
         description='Whether to start RVIZ'
     )
 
-    # SLAM Argument
-    slam_arg = DeclareLaunchArgument(
-        'slam',
-        default_value='False',
-        description='Whether to run SLAM Toolbox'
-    )
-
     # SLAM Toolbox
     slam = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')
         ),
-        # Pass 'use_sim_time' to SLAM so it syncs with Gazebo
-        launch_arguments={'use_sim_time': 'true'}.items(),
-        condition=IfCondition(LaunchConfiguration('slam'))
+        launch_arguments={
+            'slam_params_file': slam_config_file,
+            'use_sim_time': 'true'}.items(),
+    )
+
+    # Launch Teleop in a NEW Terminal Window
+    teleop_node = ExecuteProcess(
+        cmd=['gnome-terminal', '--', 'ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard'],
+        output='screen'
     )
 
 
     # === Nodes ===
-    # Robot State Publisher (Required for TF tree)
-    robot_description = Command(['xacro ', xacro_file])         # Robot Description
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='both',
-        parameters=[{
-            'use_sim_time': True,
-            'robot_description': ParameterValue(robot_description, value_type=str),
-        }]
-    )
-
     # Gazebo Fortress Simulation
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -100,7 +87,8 @@ def generate_launch_description():
         executable='parameter_bridge',
         parameters=[{
             'config_file': bridge_config_file,
-            'expand_gz_topic_names': True
+            'expand_gz_topic_names': True,
+            'use_sim_time': True,
         }],
         output='screen'
     )
@@ -111,9 +99,21 @@ def generate_launch_description():
         executable='rviz2',
         arguments=['-d', rviz_config_file],
         output='screen',
-        condition=IfCondition(LaunchConfiguration('use_rviz')),
         parameters=[{
             'use_sim_time': True
+        }]
+    )
+
+    # Robot State Publisher (Required for TF tree)
+    robot_description = Command(['xacro ', xacro_file])         # Robot Description
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='both',
+        parameters=[{
+            'use_sim_time': True,
+            'robot_description': ParameterValue(robot_description, value_type=str),
         }]
     )
 
@@ -123,11 +123,11 @@ def generate_launch_description():
         set_gpu_env,
         set_glx_env,
         rviz_arg,
-        slam_arg,
-        slam,
-        robot_state_publisher,
-        gazebo,
+        gazebo,        # 先啟動 Gazette
+        bridge,        # 再啟動 TF + /clock + scan bridge
+        robot_state_publisher,  # 最後啟動 RSP
         spawn,
-        bridge,
+        slam,
         rviz,
+        teleop_node,
     ])

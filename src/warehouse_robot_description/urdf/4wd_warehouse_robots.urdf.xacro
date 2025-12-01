@@ -41,7 +41,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://warehouse_robot_description/meshes/base_link.STL"
+        <mesh filename="package://warehouse_robot_description/meshes/4wd/base_link.STL"
               scale="${S} ${S} ${S}"/>
       </geometry>
       <material name="default_color"/>
@@ -50,7 +50,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://warehouse_robot_description/meshes/base_link.STL"
+        <mesh filename="package://warehouse_robot_description/meshes/4wd/base_link.STL"
               scale="${S} ${S} ${S}"/>
       </geometry>
     </collision>
@@ -78,7 +78,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://warehouse_robot_description/meshes/${mesh}"
+          <mesh filename="package://warehouse_robot_description/meshes/4wd/${mesh}"
                 scale="${S} ${S} ${S}"/>
         </geometry>
         <material name="default_color"/>
@@ -87,7 +87,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://warehouse_robot_description/meshes/${mesh}"
+          <mesh filename="package://warehouse_robot_description/meshes/4wd/${mesh}"
                 scale="${S} ${S} ${S}"/>
         </geometry>
       </collision>

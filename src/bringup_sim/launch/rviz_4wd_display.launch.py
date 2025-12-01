@@ -7,35 +7,20 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
-    # --- 1. Define Package Names (SPLIT STRUCTURE) ---
+    # Path
     description_pkg_name = 'warehouse_robot_description' 
     bringup_pkg_name = 'bringup_sim'
-
-    # Ensure this matches your actual filename in the 'urdf' folder!
-    xacro_file_name = 'warehouse_robots.urdf.xacro' 
+    xacro_file_name = '4wd_warehouse_robots.urdf.xacro' 
     rviz_file_name = 'rviz_display.rviz'
-
-    # --- 2. Build Paths ---
     # Find the URDF inside the description package
-    xacro_path = os.path.join(
-        get_package_share_directory(description_pkg_name),
-        'urdf',
-        xacro_file_name
-    )
-
-    # Find the Rviz config inside the bringup package
-    rviz_path = os.path.join(
-        get_package_share_directory(bringup_pkg_name),
-        'config',
-        rviz_file_name
-    )
+    xacro_path = os.path.join(get_package_share_directory(description_pkg_name), 'urdf', xacro_file_name)
+    rviz_path = os.path.join(get_package_share_directory(bringup_pkg_name),'config', rviz_file_name)
 
     # Process the URDF file
     robot_description = Command(['xacro ', xacro_path])
     
-    # --- 3. Nodes ---
-
-    # Node A: Robot State Publisher (Publishes TF tree)
+    # Nodes
+    # Robot State Publisher (Publishes TF tree)
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -51,7 +36,7 @@ def generate_launch_description():
         output='screen',
     )
     
-    # Node C: RViz
+    # RViz
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
