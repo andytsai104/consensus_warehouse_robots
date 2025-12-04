@@ -84,9 +84,9 @@ ros2 launch bringup_sim gazebo_slam.launch.py
 
 Save the map (run this in another terminal):
 ```text
-ros2 run nav2_map_server map_saver_cli -f ./src/gazebo_sim/maps/warehouse_map
+ros2 run nav2_map_server map_saver_cli -f ./src/bringup_sim/maps/warehouse_map
 ```
-This will generate `warehouse_map.yaml` and `warehouse_map.pgm` inside `consensus_warehouse_robots/src/gazebo_sim/maps`, which can be used later for localization and navigation runs.
+This will generate `warehouse_map.yaml` and `warehouse_map.pgm` inside `consensus_warehouse_robots/src/bringup_sim/maps`, which can be used later for localization and navigation runs.
 
 
 ---
