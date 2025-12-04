@@ -68,18 +68,23 @@ source install/setup.bash
 
 3. Launch Simulation
 We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-GZ Bridge automatically.
-Basic Simulation (Drive Around):
+(hint: use the pop-up terminal and keyboard to control the robot.)
+- Basic Simulation (Drive Around):
 ```text
 ros2 launch bringup_sim gazebo_sim.launch.py
 ```
 
-Simulation with Mapping (SLAM):
+- Simulation with Mapping (SLAM):
 ```text
 ros2 launch bringup_sim gazebo_slam.launch.py
 ```
+(hint: to get a better map, use q/z to adjust speed to 0.10~0.15 and turn to 0.3~0.5)
 
-4. Control the Robot
-The robot uses a differential drive controller in another pop-up terminal.
+Save the map (run this in another terminal):
+```text
+ros2 run nav2_map_server map_saver_cli -f ./src/gazebo_sim/maps/warehouse_map
+```
+
 
 ---
 ## Key Features
@@ -98,7 +103,7 @@ The robot uses a differential drive controller in another pop-up terminal.
 - [x] Robot Design: 2-Wheel Differential Drive with Caster (Low friction turning).
 - [x] Simulation: Migration from Gazebo Classic to Fortress.
 - [x] Sensors: Lidar implementation and TF tree alignment.
-- [ ] Mapping: SLAM Toolbox integration.
+- [x] Mapping: SLAM Toolbox integration.
 
 ### Phase 2: Navigation & Control
 - [ ] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
