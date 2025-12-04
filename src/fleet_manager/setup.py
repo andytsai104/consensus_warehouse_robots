@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'auctioneer_node = fleet_manager.auctioneer_node:main',   
+            'bidder_node = fleet_manager.bidder_node:main',     
         ],
     },
 )
