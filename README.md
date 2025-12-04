@@ -68,22 +68,23 @@ source install/setup.bash
 
 3. Launch Simulation
 We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-GZ Bridge automatically.
-(hint: use the pop-up terminal and keyboard to control the robot.)
-- Basic Simulation (Drive Around):
+*hint: Use the pop-up teleop window to drive the robot.*
+3.1 Basic Simulation (Drive Around):
 ```text
 ros2 launch bringup_sim gazebo_sim.launch.py
 ```
 
-- Simulation with Mapping (SLAM):
+3.2 Simulation with Mapping (SLAM):
 ```text
 ros2 launch bringup_sim gazebo_slam.launch.py
 ```
-(hint: to get a better map, use q/z to adjust speed to 0.10~0.15 and turn to 0.3~0.5)
+*Tip: to get a better map, use q/z to adjust speed ≈ 0.15 and turn ≈ 0.3*
 
 Save the map (run this in another terminal):
 ```text
 ros2 run nav2_map_server map_saver_cli -f ./src/gazebo_sim/maps/warehouse_map
 ```
+This will generate `warehouse_map.yaml` and `warehouse_map.pgm` inside `consensus_warehouse_robots/src/gazebo_sim/maps`, which can be used later for localization and navigation runs.
 
 
 ---
