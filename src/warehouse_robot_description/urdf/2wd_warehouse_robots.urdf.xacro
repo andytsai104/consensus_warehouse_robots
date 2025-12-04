@@ -172,13 +172,17 @@
 
   <!-- Frictionless Caster (Critical for smooth turning) -->
   <gazebo reference="caster_wheel">
-    <mu1>0.01</mu1>
-    <mu2>0.01</mu2>
+    <mu1>200.0</mu1>
+    <mu2>100.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
   </gazebo>
 
   <gazebo reference="caster_connection">
-    <mu1>0.1</mu1>
-    <mu2>0.1</mu2>
+    <mu1>200.0</mu1>
+    <mu2>100.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
   </gazebo>
 
   <!-- ===========================
@@ -221,7 +225,7 @@
       <always_on>true</always_on>
       <visualize>true</visualize>
       <topic>scan</topic>
-      <update_rate>30</update_rate>
+      <update_rate>50</update_rate>
       <gz_frame_id>lidar_link</gz_frame_id>
       <frame_id>lidar_link</frame_id>
       <ray>
@@ -262,7 +266,8 @@
       <!-- Joints -->
       <left_joint>left_wheel_joint</left_joint>
       <right_joint>right_wheel_joint</right_joint>
-      <wheel_separation>1.1115</wheel_separation>
+      <!-- <wheel_separation>1.1115</wheel_separation> -->
+      <wheel_separation>0.8</wheel_separation>
       <wheel_radius>0.1755</wheel_radius>
 
       <min_acceleration>-10</min_acceleration>
@@ -274,7 +279,7 @@
       <tf_topic>/tf</tf_topic>
       <frame_id>odom</frame_id>
       <child_frame_id>base_footprint</child_frame_id>
-      <odom_publish_frequency>30</odom_publish_frequency>
+      <odom_publish_frequency>50</odom_publish_frequency>
     </plugin>
   </gazebo>
 

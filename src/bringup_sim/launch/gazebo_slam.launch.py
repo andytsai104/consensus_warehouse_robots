@@ -34,12 +34,6 @@ def generate_launch_description():
     set_gpu_env = SetEnvironmentVariable(name='__NV_PRIME_RENDER_OFFLOAD', value='1')
     set_glx_env = SetEnvironmentVariable(name='__GLX_VENDOR_LIBRARY_NAME', value='nvidia')
 
-    # RViz Argument
-    rviz_arg = DeclareLaunchArgument(
-        'use_rviz',
-        default_value='True',
-        description='Whether to start RVIZ'
-    )
 
     # SLAM Toolbox
     slam = IncludeLaunchDescription(
@@ -122,7 +116,6 @@ def generate_launch_description():
         resource_env,
         set_gpu_env,
         set_glx_env,
-        rviz_arg,
         gazebo,        # 先啟動 Gazette
         bridge,        # 再啟動 TF + /clock + scan bridge
         robot_state_publisher,  # 最後啟動 RSP
