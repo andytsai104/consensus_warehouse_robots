@@ -71,7 +71,7 @@
     <origin xyz="-0.48569 0.55575 -0.1755" rpy="1.5708 0 0" />
     <parent link="base_link" />
     <child link="left_wheel" />
-    <axis xyz="0 0 1" />
+    <axis xyz="0 0 -1" />
     <limit effort="100" velocity="10" />
   </joint>
 
@@ -221,7 +221,7 @@
       <always_on>true</always_on>
       <visualize>true</visualize>
       <topic>scan</topic>
-      <update_rate>100</update_rate>
+      <update_rate>30</update_rate>
       <gz_frame_id>lidar_link</gz_frame_id>
       <frame_id>lidar_link</frame_id>
       <ray>
@@ -273,9 +273,19 @@
       <odom_topic>/odom</odom_topic>
       <tf_topic>/tf</tf_topic>
       <frame_id>odom</frame_id>
-      <child_frame_id>base_link</child_frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
       <odom_publish_frequency>30</odom_publish_frequency>
     </plugin>
+  </gazebo>
+
+  <!-- ===========================
+       Joint State
+  ============================ -->
+  <gazebo>
+  <plugin filename="libignition-gazebo-joint-state-publisher-system.so" 
+          name="ignition::gazebo::systems::JointStatePublisher">
+    <topic>joint_states</topic>
+  </plugin>
   </gazebo>
 
 </robot>
