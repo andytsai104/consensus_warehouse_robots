@@ -68,7 +68,9 @@ source install/setup.bash
 
 3. Launch Simulation
 We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-GZ Bridge automatically.
+
 *hint: Use the pop-up teleop window to drive the robot.*
+
 3.1 Basic Simulation (Drive Around):
 ```text
 ros2 launch bringup_sim gazebo_sim.launch.py
