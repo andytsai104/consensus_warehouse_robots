@@ -19,7 +19,7 @@ def generate_launch_description():
     world_file = os.path.join(pkg_gazebo_sim, 'worlds', 'warehouse_world.sdf')              # World files
     xacro_file = os.path.join(pkg_description, 'urdf', '2wd_warehouse_robots.urdf.xacro')   # Robot description
     bridge_config_file = os.path.join(pkg_bringup_sim, 'config', 'ros_gz_bridges.yaml')     # Bridge config
-    slam_config_file = os.path.join(pkg_bringup_sim, 'config', 'slam_nav2_params.yaml')     # SLAM config
+    slam_config_file = os.path.join(pkg_bringup_sim, 'config', 'slam_mapper_params.yaml')   # SLAM config
     pkg_slam_toolbox = get_package_share_directory('slam_toolbox')                          # SLAM Toolbox package 
     
 
