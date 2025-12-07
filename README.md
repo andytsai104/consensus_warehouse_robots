@@ -49,7 +49,8 @@ sudo apt-get install ros-humble-ros-gz \
                      ros-humble-navigation2 \
                      ros-humble-nav2-bringup \
                      ros-humble-xacro \
-                     ros-humble-robot-state-publisher
+                     ros-humble-robot-state-publisher \
+                     ros-humble-nav2-simple-commander \
 ```
 
 2. Build the Workspace
@@ -115,7 +116,7 @@ In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a n
 - [x] Mapping: SLAM Toolbox integration.
 
 ### Phase 2: Navigation & Control
-- [ ] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
+- [x] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
 - [ ] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
 - [ ] Multi-Robot Spawning: Create launch files to spawn /robot1 and /robot2 with separate namespaces.
 
