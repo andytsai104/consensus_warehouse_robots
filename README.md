@@ -117,8 +117,8 @@ In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a n
 
 ### Phase 2: Navigation & Control
 - [x] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
-- [ ] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
-- [ ] Multi-Robot Spawning: Create launch files to spawn /robot1 and /robot2 with separate namespaces.
+- [x] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
+- [ ] Multi-Robot Spawning: Create launch files to spawn /robot1, /robot2, /robot3, ... with separate namespaces.
 
 ### Phase 3: Fleet Management (The Core Logic)
 - [ ] Task Manager Node: Create the "Auctioneer" that broadcasts tasks.
@@ -147,5 +147,6 @@ M.S. Robotics & Autonomous Systems @ ASU
 - [Simulation with ROS 2 Humble + Ignition Fortress (Gazebo) using the nav2 framework and Slam Toolbox](https://www.youtube.com/watch?v=otlqoRIzzdI)
 - [动手学ROS2](https://fishros.com/d2lros2/#/)
 - [ROS 2 Tutorials](https://www.youtube.com/playlist?list=PLgG0XDQqJckkSJDPhXsFU_RIqEh08nG0V)
+- [Spawning multiple robots in Gazebo with ROS2](https://www.youtube.com/watch?v=OMwK8u7bap0)
 
 ---
