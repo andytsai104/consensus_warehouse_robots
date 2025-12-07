@@ -143,8 +143,8 @@ M.S. Robotics & Autonomous Systems @ ASU
 - [Making robot navigation easy with Nav2 and ROS!](https://www.youtube.com/watch?v=jkoGkAd0GYk&t=456s)
 - [Gz-sim official github](https://github.com/gazebosim/gz-sim/)
 - [Official Gazebo website](https://gazebosim.org/docs/all/getstarted/)
-+ [Simulation with ROS 2 Humble + Ignition Fortress (Gazebo) using the nav2 framework and Slam Toolbox](https://www.youtube.com/watch?v=otlqoRIzzdI)
-* [动手学ROS2](https://fishros.com/d2lros2/#/)
+- [Simulation with ROS 2 Humble + Ignition Fortress (Gazebo) using the nav2 framework and Slam Toolbox](https://www.youtube.com/watch?v=otlqoRIzzdI)
+- [动手学ROS2](https://fishros.com/d2lros2/#/)
 - [ROS 2 Tutorials](https://www.youtube.com/playlist?list=PLgG0XDQqJckkSJDPhXsFU_RIqEh08nG0V)
 
 ---
