@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='andy',
     maintainer_email='andytsai104@gmail.com',
-    description='TODO: Package description',
+    description='Core tasks manager for consensus warehouse robots',
     license='TODO: License declaration',
     extras_require={
         'test': [
@@ -24,6 +24,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'warehouse_robot_controller = fleet_manager.warehouse_robot_controller:main',
+            'auctioneer_node = fleet_manager.auctioneer_node:main',   
+            'bidder_node = fleet_manager.bidder_node:main',    
         ],
     },
 )

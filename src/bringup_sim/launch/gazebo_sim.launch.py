@@ -15,7 +15,7 @@ def generate_launch_description():
     pkg_gazebo_sim = get_package_share_directory('gazebo_sim')
     pkg_bringup_sim = get_package_share_directory('bringup_sim')
     install_dir = os.path.dirname(pkg_description)                                          # Gets 'install/share' parent
-    rviz_config_file = os.path.join(pkg_bringup_sim, 'config', 'rviz_gazebo_sim.rviz')        # RViz config
+    rviz_config_file = os.path.join(pkg_bringup_sim, 'config', 'rviz_gazebo_sim.rviz')      # RViz config
     world_file = os.path.join(pkg_gazebo_sim, 'worlds', 'warehouse_world.sdf')              # World files
     xacro_file = os.path.join(pkg_description, 'urdf', '2wd_warehouse_robots.urdf.xacro')   # Robot description
     bridge_config_file = os.path.join(pkg_bringup_sim, 'config', 'ros_gz_bridges.yaml')     # Bridge config
@@ -48,7 +48,7 @@ def generate_launch_description():
         launch_arguments={'gz_args': f'-r {world_file}'}.items(),
     )
 
-    # Spawn the Robot
+    # Spawn a Robot
     spawn = Node(
         package='ros_gz_sim',
         executable='create',
