@@ -6,7 +6,7 @@ from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch.actions import IncludeLaunchDescription, AppendEnvironmentVariable, SetEnvironmentVariable, DeclareLaunchArgument, ExecuteProcess
-from launch.conditions import IfCondition, UnlessCondition
+from launch.conditions import IfCondition
 
 def generate_launch_description():
     # === Paths ===
@@ -34,22 +34,16 @@ def generate_launch_description():
     set_gpu_env = SetEnvironmentVariable(name='__NV_PRIME_RENDER_OFFLOAD', value='1')
     set_glx_env = SetEnvironmentVariable(name='__GLX_VENDOR_LIBRARY_NAME', value='nvidia')
 
-
-    # SLAM Toolbox
-    slam = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')
-        ),
-        launch_arguments={
-            'slam_params_file': slam_config_file,
-            'use_sim_time': 'true'}.items(),
+    # SLAM arg (determine if using SLAM mode)
+    teleop_arg = DeclareLaunchArgument(
+        'teleop',
+        default_value='True',
+        description='Whether to run SLAM Toolbox and the Mapping RViz'
     )
+    
+    # Capture the argument value
+    use_teleop = LaunchConfiguration('teleop')
 
-    # Launch Teleop in a NEW Terminal Window
-    teleop_node = ExecuteProcess(
-        cmd=['gnome-terminal', '--', 'ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard'],
-        output='screen'
-    )
 
 
     # === Nodes ===
@@ -95,11 +89,12 @@ def generate_launch_description():
         output='screen',
         parameters=[{
             'use_sim_time': True
-        }]
+        }],
+        condition=IfCondition(use_teleop),
     )
 
     # Robot State Publisher (Required for TF tree)
-    robot_description = Command(['xacro ', xacro_file])         # Robot Description
+    robot_description = Command(['xacro ', xacro_file])
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -111,14 +106,32 @@ def generate_launch_description():
         }]
     )
 
+    # SLAM Toolbox
+    slam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')
+        ),
+        launch_arguments={
+            'slam_params_file': slam_config_file,
+            'use_sim_time': 'true'}.items(),
+    )
+
+    # Launch Teleop in a NEW Terminal Window
+    teleop_node = ExecuteProcess(
+        cmd=['gnome-terminal', '--', 'ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard'],
+        output='screen',
+        condition=IfCondition(use_teleop),
+    )
+
 
     return LaunchDescription([
+        teleop_arg,
         resource_env,
         set_gpu_env,
         set_glx_env,
-        gazebo,        # 先啟動 Gazette
-        bridge,        # 再啟動 TF + /clock + scan bridge
-        robot_state_publisher,  # 最後啟動 RSP
+        gazebo,
+        bridge,
+        robot_state_publisher,
         spawn,
         slam,
         rviz,
