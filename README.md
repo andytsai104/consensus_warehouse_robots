@@ -71,22 +71,28 @@ We use a modular launch file that handles the Robot, Gazebo, RViz, and the ROS-G
 
 *hint: Use the pop-up teleop window to drive the robot.*
 
-3.1 Basic Simulation (Drive Around):
+3.1 Basic Simulation (Drive Around)
 ```text
 ros2 launch bringup_sim gazebo_sim.launch.py
 ```
 
-3.2 Simulation with Mapping (SLAM):
+3.2 Simulation with Mapping (SLAM)
 ```text
 ros2 launch bringup_sim gazebo_slam.launch.py
 ```
 *Tip: to get a better map, use q/z to adjust speed ≈ 0.15 and turn ≈ 0.3*
 
-Save the map (run this in another terminal):
+Save the map (run this in another terminal)
 ```text
 ros2 run nav2_map_server map_saver_cli -f ./src/bringup_sim/maps/warehouse_map
 ```
 This will generate `warehouse_map.yaml` and `warehouse_map.pgm` inside `consensus_warehouse_robots/src/bringup_sim/maps`, which can be used later for localization and navigation runs.
+
+3.3 Navigation
+```text
+ros2 launch bringup_sim gazebo_navigation.launch.py
+```
+In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a navigation goal to the robot.
 
 
 ---
@@ -130,5 +136,15 @@ M.S. Robotics & Autonomous Systems @ ASU
 📧 andystsai1040@gmail.com  
 🌐 [LinkedIn link](https://www.linkedin.com/in/chih-hao-tsai/)
 🌐 [Github Profile](https://github.com/andytsai104)
+
+---
+
+## References & Resources
+- [Making robot navigation easy with Nav2 and ROS!](https://www.youtube.com/watch?v=jkoGkAd0GYk&t=456s)
+- [Gz-sim official github](https://github.com/gazebosim/gz-sim/)
+- [Official Gazebo website](https://gazebosim.org/docs/all/getstarted/)
++ [Simulation with ROS 2 Humble + Ignition Fortress (Gazebo) using the nav2 framework and Slam Toolbox](https://www.youtube.com/watch?v=otlqoRIzzdI)
+* [动手学ROS2](https://fishros.com/d2lros2/#/)
+- [ROS 2 Tutorials](https://www.youtube.com/playlist?list=PLgG0XDQqJckkSJDPhXsFU_RIqEh08nG0V)
 
 ---
