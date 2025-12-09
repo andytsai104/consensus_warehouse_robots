@@ -2,6 +2,8 @@
 
 import json
 import math
+from typing import Dict, List, Optional
+
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
@@ -20,14 +22,17 @@ def yaw_to_quaternion_z(yaw: float):
 
 
 class BidderNode(Node):
-    """Bidder node for Phase 3.
+    """Bidder node for consensus-based Phase 3.
 
-    Current version:
+    In the consensus version:
     - Subscribes to /task_auction (JSON encoded tasks).
-    - Computes a real cost using Nav2 ComputePathToPose (path length).
-    - Publishes bids on /task_bids.
-    - Subscribes to /task_assignment and reacts when this robot is the winner.
-    - Executes assigned tasks by sending a NavigateToPose goal to Nav2.
+      * Computes a real cost using Nav2 ComputePathToPose (path length).
+      * Publishes its bid on /task_bids.
+    - Subscribes to /task_bids and collects all bids for the current task.
+    - After a local timeout, selects the lowest-cost bid LOCALLY.
+      * If this robot is the winner, it executes the task via NavigateToPose.
+    - No central node decides the winner; every bidder runs the same rule,
+      so they reach consensus on the winner.
     """
 
     def __init__(self) -> None:
@@ -39,10 +44,21 @@ class BidderNode(Node):
             self.get_parameter("robot_id").get_parameter_value().string_value
         )
 
+        # Parameter controlling how long we wait for bids (seconds)
+        self.declare_parameter("bid_timeout_sec", 3.0)
+        self.bid_timeout_sec = (
+            self.get_parameter("bid_timeout_sec").get_parameter_value().double_value
+        )
+
         # Simple availability flag so the robot only handles one task at a time
         self.available: bool = True
 
-        # Publisher to send bids to the auctioneer
+        # Current task under auction (for this robot's local consensus)
+        self.current_task: Optional[Dict] = None
+        self.current_task_start_time: Optional[float] = None
+        self.collected_bids: List[Dict] = []
+
+        # Publisher to send bids
         self.bid_pub = self.create_publisher(String, "/task_bids", 10)
 
         # Subscriber to receive task auctions
@@ -50,9 +66,9 @@ class BidderNode(Node):
             String, "/task_auction", self.task_callback, 10
         )
 
-        # Subscriber to receive final task assignments
-        self.assignment_sub = self.create_subscription(
-            String, "/task_assignment", self.assignment_callback, 10
+        # Subscriber to receive all bids (from all robots)
+        self.bids_sub = self.create_subscription(
+            String, "/task_bids", self.bid_callback, 10
         )
 
         # Action client to compute path cost with Nav2
@@ -61,19 +77,30 @@ class BidderNode(Node):
         )
 
         # Action client to send navigation goals to Nav2
-        # Note: with namespace="robot1", this becomes /robot1/navigate_to_pose.
+        # With namespace="robot1", this becomes /robot1/navigate_to_pose.
         self.navigate_client = ActionClient(
             self, NavigateToPose, "navigate_to_pose"
         )
 
+        # Timer to periodically check whether the bidding window has closed
+        self.consensus_timer = self.create_timer(
+            0.5, self.consensus_timer_callback
+        )
+
         self.get_logger().info(
-            f"BidderNode started for robot_id={self.robot_id}"
+            f"BidderNode (consensus mode) started for robot_id={self.robot_id}, "
+            f"bid_timeout_sec={self.bid_timeout_sec:.1f}"
         )
 
     # ---------------- Auction handling ----------------
 
     def task_callback(self, msg: String) -> None:
         """Handle incoming task and publish a bid based on path length."""
+        # If we are already processing a task (waiting for bids or executing),
+        # ignore new tasks for now. Policy can be changed if needed.
+        if self.current_task is not None:
+            return
+
         if not self.available:
             # Robot is busy executing another task; ignore new auctions
             return
@@ -91,12 +118,21 @@ class BidderNode(Node):
             self.get_logger().warn("Task is missing task_id or target.")
             return
 
+        # Store this as the current task under local auction
+        self.current_task = task
+        self.current_task_start_time = (
+            self.get_clock().now().nanoseconds * 1e-9
+        )
+        self.collected_bids = []
+
         # Compute cost using Nav2 ComputePathToPose
         cost = self.compute_cost_to_target(target)
         if cost is None:
             self.get_logger().warn(
                 f"Failed to compute path cost for task {task_id}; no bid sent."
             )
+            # We still keep current_task so we can see others' bids and
+            # participate in consensus on the winner, even if we do not bid.
             return
 
         bid = {
@@ -110,7 +146,7 @@ class BidderNode(Node):
         self.bid_pub.publish(bid_msg)
 
         self.get_logger().info(
-            f"Sent bid for task {task_id} with cost {cost:.3f} "
+            f"[BID] Sent bid for task {task_id} with cost {cost:.3f} "
             f"from robot {self.robot_id}"
         )
 
@@ -139,7 +175,7 @@ class BidderNode(Node):
         goal_msg.goal = pose
 
         self.get_logger().info(
-            f"Requesting path to "
+            f"[COST] Requesting path to "
             f"({pose.pose.position.x:.2f}, {pose.pose.position.y:.2f}, yaw={yaw:.2f})"
         )
 
@@ -168,51 +204,111 @@ class BidderNode(Node):
             length += math.hypot(dx, dy)
             last = p
 
-        self.get_logger().info(f"Computed path length: {length:.3f}")
+        self.get_logger().info(f"[COST] Computed path length: {length:.3f}")
         return length
 
-    # ---------------- Assignment handling ----------------
+    # ---------------- Bid collection (for consensus) ----------------
 
-    def assignment_callback(self, msg: String) -> None:
-        """React to task assignments from the auctioneer."""
+    def bid_callback(self, msg: String) -> None:
+        """Collect all bids for the current task from /task_bids."""
+        if self.current_task is None:
+            # No active task under local auction
+            return
+
         try:
-            assignment = json.loads(msg.data)
+            bid = json.loads(msg.data)
         except json.JSONDecodeError:
-            self.get_logger().warn("Received invalid JSON assignment.")
+            self.get_logger().warn("Received invalid JSON bid.")
             return
 
-        task_id = assignment.get("task_id")
-        robot_id = assignment.get("robot_id")
-        target = assignment.get("target")
+        task_id = bid.get("task_id")
+        robot_id = bid.get("robot_id")
+        cost = bid.get("cost")
 
-        # Ignore assignments meant for other robots
-        if robot_id != self.robot_id:
+        if task_id is None or robot_id is None or cost is None:
+            self.get_logger().warn("Bid is missing task_id, robot_id or cost.")
             return
 
-        if task_id is None or target is None:
-            self.get_logger().warn("Assignment is missing task_id or target.")
+        # Only collect bids for the current task
+        if task_id != self.current_task.get("task_id"):
             return
 
-        if not self.available:
+        # Append to local list; we rely on the same set of bids being seen by
+        # all robots to achieve consensus on the winner.
+        self.collected_bids.append(bid)
+        self.get_logger().info(
+            f"[BID-RECV] Saw bid for task {task_id} from {robot_id} "
+            f"with cost {cost:.3f}"
+        )
+
+    # ---------------- Local consensus on the winner ----------------
+
+    def consensus_timer_callback(self) -> None:
+        """Periodically check if the bidding window has closed for the current task."""
+        if self.current_task is None:
+            return
+
+        if self.current_task_start_time is None:
+            return
+
+        now_sec = self.get_clock().now().nanoseconds * 1e-9
+        elapsed = now_sec - self.current_task_start_time
+
+        if elapsed < self.bid_timeout_sec:
+            # Still waiting for more bids
+            return
+
+        task_id = self.current_task.get("task_id")
+
+        if not self.collected_bids:
             self.get_logger().warn(
-                f"Received assignment for task {task_id} while busy. Ignoring."
+                f"[CONSENSUS] No bids received for task {task_id} "
+                f"(from local perspective). Dropping task."
             )
+            # Clear state and wait for the next task
+            self.current_task = None
+            self.current_task_start_time = None
+            self.collected_bids = []
             return
 
-        # Mark as busy and execute task via Nav2
-        self.available = False
+        # Select the bid with the smallest cost (local decision).
+        best_bid = min(self.collected_bids, key=lambda b: b["cost"])
+        winner_robot = best_bid["robot_id"]
+
         self.get_logger().info(
-            f"Task {task_id} assigned to me ({self.robot_id}). "
-            f"Target: {target}"
+            f"[CONSENSUS] Local winner for task {task_id}: {winner_robot} "
+            f"(cost={best_bid['cost']:.3f})"
         )
 
-        self.execute_task(task_id, target)
+        # If this robot is the winner, execute the task
+        if winner_robot == self.robot_id:
+            if not self.available:
+                self.get_logger().warn(
+                    f"[CONSENSUS] I am winner for task {task_id}, "
+                    f"but I am marked as busy. Skipping execution."
+                )
+            else:
+                target = self.current_task.get("target")
+                if target is None:
+                    self.get_logger().warn(
+                        f"[CONSENSUS] No target found in task {task_id}."
+                    )
+                else:
+                    self.available = False
+                    self.get_logger().info(
+                        f"[EXEC] Task {task_id} assigned to me ({self.robot_id}). "
+                        f"Target: {target}"
+                    )
+                    self.execute_task(task_id, target)
+                    self.available = True
+                    self.get_logger().info(
+                        f"[EXEC] Task {task_id} completed by {self.robot_id}."
+                    )
 
-        # Mark as available again after execution
-        self.available = True
-        self.get_logger().info(
-            f"Task {task_id} completed by {self.robot_id}."
-        )
+        # Clear state so the next task can be processed
+        self.current_task = None
+        self.current_task_start_time = None
+        self.collected_bids = []
 
     # ---------------- Nav2 execution ----------------
 
@@ -238,7 +334,7 @@ class BidderNode(Node):
         goal_msg.pose = pose
 
         self.get_logger().info(
-            f"Sending NavigateToPose goal for task {task_id}: "
+            f"[EXEC] Sending NavigateToPose goal for task {task_id}: "
             f"({pose.pose.position.x:.2f}, {pose.pose.position.y:.2f}, yaw={yaw:.2f})"
         )
 
@@ -249,7 +345,7 @@ class BidderNode(Node):
 
         if not goal_handle or not goal_handle.accepted:
             self.get_logger().error(
-                f"NavigateToPose goal for task {task_id} was rejected."
+                f"[EXEC] NavigateToPose goal for task {task_id} was rejected."
             )
             return
 
@@ -258,7 +354,7 @@ class BidderNode(Node):
         result = result_future.result()
 
         self.get_logger().info(
-            f"NavigateToPose result for task {task_id}: status={result.status}"
+            f"[EXEC] NavigateToPose result for task {task_id}: status={result.status}"
         )
 
 
