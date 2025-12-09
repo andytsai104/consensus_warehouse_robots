@@ -48,9 +48,28 @@ def generate_launch_description():
         }],
     )
 
+    # Auctioneer
+    auctioneer = Node(
+        package='fleet_manager',
+        executable='auctioneer_node',
+        name='auctioneer_node',
+        output='screen',
+        parameters=[{'bid_timeout_sec': 3.0}],
+    )
+    
+    # Bidder
+    bidder_robot1 = Node(
+        package='fleet_manager',
+        executable='bidder_node',
+        name='bidder_robot1',
+        output='screen',
+        parameters=[{'robot_id': 'robot1'}],
+    )    
 
     return LaunchDescription([
         gz_simulation,
         nav2,
         rviz,
+        auctioneer,
+        bidder_robot1,
     ])
