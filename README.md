@@ -97,16 +97,6 @@ In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a n
 
 
 ---
-## Key Features
-
-* **Advanced Physics:** Custom inertia tensors and friction coefficients (`mu1`/`mu2`) tuned for realistic skid-steering/differential drive in Gazebo Fortress.
-* **Sensor Fusion:**
-    * **Lidar:** GPU-accelerated Ray Sensor mounted on `lidar_link`.
-    * **Odometry:** DiffDrive plugin publishing to `/odom` and `/tf`.
-* **ROS-GZ Bridge:** YAML-configured bridge for scalable topic communication (`/cmd_vel`, `/scan`, `/tf`).
-* **Mapping:** Integrated `slam_toolbox` for generating 2D occupancy grids of the warehouse.
-
----
 
 ## Roadmap & TODO
 ### Phase 1: Simulation Basics
@@ -118,7 +108,7 @@ In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a n
 ### Phase 2: Navigation & Control
 - [x] Nav2 Setup: Configure Costmaps (Inflation layers) and Path Planners.
 - [x] Waypoints: Test autonomous navigation to specific (x,y) coordinates.
-- [ ] Multi-Robot Spawning: Create launch files to spawn /robot1, /robot2, /robot3, ... with separate namespaces.
+- [x] Multi-Robot Spawning: Create launch files to spawn /robot1, /robot2, /robot3, ... with separate namespaces.
 
 ### Phase 3: Fleet Management (The Core Logic)
 - [ ] Task Manager Node: Create the "Auctioneer" that broadcasts tasks.
@@ -137,6 +127,9 @@ M.S. Robotics & Autonomous Systems @ ASU
 📧 andystsai1040@gmail.com  
 🌐 [LinkedIn link](https://www.linkedin.com/in/chih-hao-tsai/)
 🌐 [Github Profile](https://github.com/andytsai104)
+
+**Alan Cheng**
+M.S. Robotics & Autonomous Systems @ ASU 
 
 ---
 
