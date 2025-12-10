@@ -31,6 +31,8 @@ class BidderNode(Node):
     - Subscribes to /task_bids and collects all bids for the current task.
     - After a local timeout, selects the lowest-cost bid LOCALLY.
       * If this robot is the winner, it executes the task via NavigateToPose.
+      * Before execution, it publishes a 'task_started' event on /task_events.
+      * After execution, it publishes a 'task_completed' event on /task_events.
     - No central node decides the winner; every bidder runs the same rule,
       so they reach consensus on the winner.
     """
@@ -61,6 +63,12 @@ class BidderNode(Node):
         # Publisher to send bids
         self.bid_pub = self.create_publisher(String, "/task_bids", 10)
 
+        # Publisher for task events (used by data_logger_node)
+        # Message format (JSON string):
+        #   {"event": "task_started", "task_id": 1, "robot_id": "robot3"}
+        #   {"event": "task_completed", "task_id": 1, "robot_id": "robot3"}
+        self.task_event_pub = self.create_publisher(String, "/task_events", 10)
+
         # Subscriber to receive task auctions
         self.task_sub = self.create_subscription(
             String, "/task_auction", self.task_callback, 10
@@ -90,6 +98,22 @@ class BidderNode(Node):
         self.get_logger().info(
             f"BidderNode (consensus mode) started for robot_id={self.robot_id}, "
             f"bid_timeout_sec={self.bid_timeout_sec:.1f}"
+        )
+
+    # ---------------- Utility: task events for data logger ----------------
+
+    def publish_task_event(self, event: str, task_id: int) -> None:
+        """Publish a task event on /task_events for data logging."""
+        payload = {
+            "event": event,
+            "task_id": int(task_id),
+            "robot_id": self.robot_id,
+        }
+        msg = String()
+        msg.data = json.dumps(payload)
+        self.task_event_pub.publish(msg)
+        self.get_logger().info(
+            f"[EVENT] {event} for task {task_id} (robot={self.robot_id})"
         )
 
     # ---------------- Auction handling ----------------
@@ -294,12 +318,17 @@ class BidderNode(Node):
                         f"[CONSENSUS] No target found in task {task_id}."
                     )
                 else:
+                    # Mark robot as busy and notify data logger that task started
                     self.available = False
-                    self.get_logger().info(
-                        f"[EXEC] Task {task_id} assigned to me ({self.robot_id}). "
-                        f"Target: {target}"
-                    )
+                    self.publish_task_event("task_started", int(task_id))
+
+                    # Execute the task via Nav2
                     self.execute_task(task_id, target)
+
+                    # Notify data logger that task completed
+                    self.publish_task_event("task_completed", int(task_id))
+
+                    # Mark as available again after execution
                     self.available = True
                     self.get_logger().info(
                         f"[EXEC] Task {task_id} completed by {self.robot_id}."
