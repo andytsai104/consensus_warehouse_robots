@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="2wd_warehouse_robot">
   
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="robot_name" default="warehouse_bot" />
   <!-- ===========================
        base_footprint
   ============================ -->
-  <link name="base_footprint"/>
+  <link name="$(arg prefix)base_footprint"/>
 
-  <joint name="base_joint" type="fixed">
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
+  <joint name="$(arg prefix)base_joint" type="fixed">
+    <parent link="$(arg prefix)base_footprint"/>
+    <child link="$(arg prefix)base_link"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
 
   <!-- ===========================
        Base link
   ============================ -->
-  <link name="base_link">
+  <link name="$(arg prefix)base_link">
     <inertial>
       <!-- Reduced mass for simulation stability (Original ~305kg -> Scaled to ~30kg) -->
       <origin xyz="-0.2043 0 0.0939" rpy="0 0 0" />
@@ -45,7 +47,7 @@
        Wheels Macro
   ============================ -->
   <!-- Left Wheel -->
-  <link name="left_wheel">
+  <link name="$(arg prefix)left_wheel">
     <inertial>
       <origin xyz="0 0 0.033" rpy="0 0 0" />
       <mass value="2.0" /> <!-- Scaled down -->
@@ -69,16 +71,16 @@
     </collision>
   </link>
 
-  <joint name="left_wheel_joint" type="continuous">
+  <joint name="$(arg prefix)left_wheel_joint" type="continuous">
     <origin xyz="-0.48569 0.55575 -0.1755" rpy="1.5708 0 0" />
-    <parent link="base_link" />
-    <child link="left_wheel" />
+    <parent link="$(arg prefix)base_link" />
+    <child link="$(arg prefix)left_wheel" />
     <axis xyz="0 0 -1" />
     <limit effort="100" velocity="10" />
   </joint>
 
   <!-- Right Wheel -->
-  <link name="right_wheel">
+  <link name="$(arg prefix)right_wheel">
     <inertial>
       <origin xyz="0 0 -0.033" rpy="0 0 0" />
       <mass value="2.0" />
@@ -102,10 +104,10 @@
     </collision>
   </link>
 
-  <joint name="right_wheel_joint" type="continuous">
+  <joint name="$(arg prefix)right_wheel_joint" type="continuous">
     <origin xyz="-0.48569 -0.55575 -0.1755" rpy="1.5708 0 0" />
-    <parent link="base_link" />
-    <child link="right_wheel" />
+    <parent link="$(arg prefix)base_link" />
+    <child link="$(arg prefix)right_wheel" />
     <axis xyz="0 0 -1" />
     <limit effort="100" velocity="10" />
   </joint>
@@ -113,7 +115,7 @@
   <!-- ===========================
        Caster Wheel Assembly
   ============================ -->
-  <link name="caster_connection">
+  <link name="$(arg prefix)caster_connection">
     <inertial>
       <origin xyz="-0.03 0 -0.11" rpy="0 0 0" />
       <mass value="0.5" />
@@ -136,14 +138,14 @@
     </collision>
   </link>
 
-  <joint name="caster_connection_joint" type="continuous">
+  <joint name="$(arg prefix)caster_connection_joint" type="continuous">
     <origin xyz="0.50656 0 0" rpy="0 0 0" />
-    <parent link="base_link" />
-    <child link="caster_connection" />
+    <parent link="$(arg prefix)base_link" />
+    <child link="$(arg prefix)caster_connection" />
     <axis xyz="0 0 -1" />
   </joint>
 
-  <link name="caster_wheel">
+  <link name="$(arg prefix)caster_wheel">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <mass value="1.0" />
@@ -166,22 +168,22 @@
     </collision>
   </link>
 
-  <joint name="caster_wheel_joint" type="continuous">
+  <joint name="$(arg prefix)caster_wheel_joint" type="continuous">
     <origin xyz="-0.13927 -0.0053 -0.22785" rpy="1.5708 0 0" />
-    <parent link="caster_connection" />
-    <child link="caster_wheel" />
+    <parent link="$(arg prefix)caster_connection" />
+    <child link="$(arg prefix)caster_wheel" />
     <axis xyz="0 0 1" />
   </joint>
 
   <!-- Frictionless Caster (Critical for smooth turning) -->
-  <gazebo reference="caster_wheel">
+  <gazebo reference="$(arg prefix)caster_wheel">
     <mu1>200.0</mu1>
     <mu2>100.0</mu2>
     <kp>1000000.0</kp>
     <kd>1.0</kd>
   </gazebo>
 
-  <gazebo reference="caster_connection">
+  <gazebo reference="$(arg prefix)caster_connection">
     <mu1>200.0</mu1>
     <mu2>100.0</mu2>
     <kp>1000000.0</kp>
@@ -191,7 +193,7 @@
   <!-- ===========================
        Sensor (LiDAR)
   ============================ -->
- <link name="lidar_link">
+ <link name="$(arg prefix)lidar_link">
     <inertial>
       <origin xyz="-0.0466543100833166 7.97140131680862E-14 0.119806074995455" rpy="0 0 0" />
       <mass value="2.61"/>
@@ -215,22 +217,22 @@
     </collision>
   </link>
   <joint
-    name="lidar_joint"
+    name="$(arg prefix)lidar_joint"
     type="fixed">
     <origin xyz="0.50656 0 0.42188" rpy="3.1416 0 0" />
-    <parent link="base_link" />
-    <child link="lidar_link" />
+    <parent link="$(arg prefix)base_link" />
+    <child link="$(arg prefix)lidar_link" />
     <axis xyz="0 0 0" />
   </joint>
 
-  <gazebo reference="lidar_link">
-    <sensor name="lidar" type="gpu_lidar">
+  <gazebo reference="$(arg prefix)lidar_link">
+    <sensor name="lidar" type="lidar">
       <always_on>true</always_on>
       <visualize>true</visualize>
       <topic>scan</topic>
       <update_rate>50</update_rate>
-      <gz_frame_id>lidar_link</gz_frame_id>
-      <frame_id>lidar_link</frame_id>
+      <gz_frame_id>$(arg prefix)lidar_link</gz_frame_id>
+      <frame_id>$(arg prefix)lidar_link</frame_id>
       <ray>
         <scan>
           <horizontal>
@@ -251,11 +253,11 @@
       </plugin>
     </sensor>
   </gazebo>
-  <gazebo reference="lidar_link">
+  <gazebo reference="$(arg prefix)lidar_link">
     <plugin filename="ignition-gazebo-pose-publisher-system.so"
             name="ignition::gazebo::systems::PosePublisher">
       <publish_tf>true</publish_tf>
-      <frame_id>lidar_link</frame_id>
+      <frame_id>$(arg prefix)lidar_link</frame_id>
     </plugin>
   </gazebo>
 
@@ -267,8 +269,8 @@
             name="ignition::gazebo::systems::DiffDrive">
       
       <!-- Joints -->
-      <left_joint>left_wheel_joint</left_joint>
-      <right_joint>right_wheel_joint</right_joint>
+      <left_joint>$(arg prefix)left_wheel_joint</left_joint>
+      <right_joint>$(arg prefix)right_wheel_joint</right_joint>
       <!-- <wheel_separation>1.1115</wheel_separation> -->
       <wheel_separation>0.8</wheel_separation>
       <wheel_radius>0.1755</wheel_radius>
@@ -277,11 +279,11 @@
       <max_acceleration>10</max_acceleration>
 
       <!-- Topics -->
-      <topic>/cmd_vel</topic>
-      <odom_topic>/odom</odom_topic>
-      <tf_topic>/tf</tf_topic>
-      <frame_id>odom</frame_id>
-      <child_frame_id>base_footprint</child_frame_id>
+      <topic>/model/$(arg robot_name)/cmd_vel</topic>
+      <odom_topic>/model/$(arg robot_name)/odom</odom_topic>
+      <tf_topic>/model/$(arg robot_name)/tf</tf_topic>
+      <frame_id>$(arg prefix)odom</frame_id>
+      <child_frame_id>$(arg prefix)base_footprint</child_frame_id>
       <odom_publish_frequency>50</odom_publish_frequency>
     </plugin>
   </gazebo>
@@ -292,7 +294,7 @@
   <gazebo>
   <plugin filename="libignition-gazebo-joint-state-publisher-system.so" 
           name="ignition::gazebo::systems::JointStatePublisher">
-    <topic>joint_states</topic>
+    <topic>/model/$(arg robot_name)/joint_states</topic>
   </plugin>
   </gazebo>
 
