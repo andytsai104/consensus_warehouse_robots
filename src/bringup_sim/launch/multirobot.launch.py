@@ -58,6 +58,14 @@ def generate_launch_description():
         parameters=[{"bid_timeout_sec": 3.0}],
     )
 
+    data_logger = Node(
+    	package='fleet_manager',
+    	executable='data_logger_node',
+    	name='data_logger',
+    	output='screen',
+        parameters=[{'bid_timeout_sec': 3.0}],
+    )
+    
     # === Per-robot group (namespace + Nav2 + bridge + bidder) ===
     robot_groups = []
 
@@ -174,6 +182,7 @@ def generate_launch_description():
             rviz,
             auctioneer,
             *robot_groups,
+            data_logger,
         ]
     )
 

@@ -27,6 +27,7 @@ setup(
             'warehouse_robot_controller = fleet_manager.warehouse_robot_controller:main',
             'auctioneer_node = fleet_manager.auctioneer_node:main',   
             'bidder_node = fleet_manager.bidder_node:main',    
+            'data_logger_node = fleet_manager.data_logger_node:main',
         ],
     },
 )
