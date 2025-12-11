@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Map1/Topic1
         - /Global Cost Map1/Update Topic1
-        - /Navigation Path1
       Splitter Ratio: 0.39520201086997986
     Tree Height: 1190
   - Class: rviz_common/Selection
@@ -34,7 +33,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.029999999329447746
         Value: Lines
@@ -47,7 +46,7 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -354,5 +353,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 3055
-  X: 455
-  Y: 54
+  X: 1052
+  Y: 276

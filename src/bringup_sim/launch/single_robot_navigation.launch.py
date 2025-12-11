@@ -70,6 +70,6 @@ def generate_launch_description():
         gz_simulation,
         nav2,
         rviz,
-        auctioneer,
-        bidder_robot1,
+        # auctioneer,
+        # bidder_robot1,
     ])

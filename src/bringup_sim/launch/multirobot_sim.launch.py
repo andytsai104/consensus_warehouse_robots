@@ -74,18 +74,18 @@ def generate_launch_description():
     # === Per-robot group (namespace + Nav2 + bridge + bidder) ===
     robot_groups = []
     initial_positions = [
-        (0, 2.5),
-        (-2, 7.5),
-        (-7.5, -7.5),
-        (2.5, -5),
-        (8, -3),
+        (0, 2.5, 0.0),
+        (-2, 7.5, -1.57),
+        (-7.5, -7.5, 1.57),
+        (2.5, -5, -1.57),
+        (8, -3, 1.57),
     ]
 
     robot_num = len(initial_positions)
     for idx in range(robot_num):
         robot_index = idx + 1
         ns = f"robot{robot_index}"
-        x_init, y_init = initial_positions[idx]
+        x_init, y_init, yaw_init = initial_positions[idx]
 
         # 1) Robot description
         # robot_description = Command(["xacro ", xacro_file])
@@ -127,6 +127,7 @@ def generate_launch_description():
                 "-x", str(x_init),
                 "-y", str(y_init),
                 "-z", "1.5",
+                "-Y", str(yaw_init),
             ],
             output="screen",
         )
@@ -167,19 +168,18 @@ def generate_launch_description():
 
 
         # Nav2
-        param_substitutions = {
-            'use_sim_time': 'True',
-            'base_frame_id': f'{ns}/base_footprint',  # robot1/base_footprint
-            'odom_frame_id': f'{ns}/odom',            # robot1/odom
-            'scan_topic': 'scan',
-            'global_frame_id': 'map',
-            'robot_base_frame': f'{ns}/base_footprint' # Critical for costmaps
-        }
-
         configured_params = RewrittenYaml(
             source_file=nav2_params_file,
             root_key=ns,
-            param_rewrites=param_substitutions,
+            param_rewrites={
+                'use_sim_time': 'True',
+                'global_frame': 'map',
+                'robot_base_frame': f'{ns}/base_footprint', # changes 'base_footprint' to 'robot1/base_footprint'
+                'base_frame_id': f'{ns}/base_footprint',
+                'odom_frame_id': f'{ns}/odom',
+                'scan_topic': 'scan',  # Local topic (remapped to /robot1/scan automatically)
+                'map_topic': '/map'    # Map is usually global
+            },
             convert_types=True
         )
         nav2 = IncludeLaunchDescription(
