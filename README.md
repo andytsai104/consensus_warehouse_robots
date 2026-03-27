@@ -95,7 +95,7 @@ ros2 launch bringup_sim gazebo_navigation.launch.py
 ```
 In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a navigation goal to the robot.
 
-
+<!--
 ---
 
 ## Roadmap & TODO
@@ -118,7 +118,7 @@ In the pop-up RViz window, use “2D Goal Pose” in the top toolbar to send a n
 ### Phase 4: Analysis & Metrics
 - [ ] Data Logger: Record metrics (Total distance traveled, Task completion time, Idle time).
 - [ ] Comparison: Compare "Consensus" performance vs. "Random Assignment" or "Nearest Neighbor".
-
+-->
 ---
 
 ## Maintainer
