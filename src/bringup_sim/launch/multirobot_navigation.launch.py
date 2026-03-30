@@ -112,10 +112,10 @@ def generate_launch_description():
                     # "frame_prefix": f"{ns}/",
                 }
             ],
-            # remappings=[
-            #     ("/tf", "/tf"),
-            #     ("/tf_static", "/tf_static")
-            # ]
+            remappings=[
+                ("/tf", "/tf"),
+                ("/tf_static", "/tf_static")
+            ]
         )
 
         # 2) Spawn robot in Gazebo

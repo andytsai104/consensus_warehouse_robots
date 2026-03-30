@@ -66,7 +66,7 @@ def main(args=None):
     node.navigator.waitUntilNav2Active()
     print("Nav2 is ready!")
 
-    node.go_to_task(0.0, -5.0)
+    node.go_to_task(-2.0, -13.5)
 
     print("Navigation is completed!")
     # Keep the node alive to listen for tasks
